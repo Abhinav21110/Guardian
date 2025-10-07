@@ -1,10 +1,10 @@
 {
-  "name": "phishguard-ai",
+  "name": "guardian-ai",
   "private": true,
   "version": "1.0.0",
-  "description": "Enterprise-Grade Real-Time Phishing Detection Platform",
-  "author": "PhishGuard Team",
-  "keywords": ["phishing", "security", "ai", "detection", "cybersecurity"],
+  "description": "Guardian AI - Advanced Threat Detection and Protection Platform",
+  "author": "Guardian Team",
+  "keywords": ["guardian", "security", "ai", "detection", "cybersecurity", "threat protection"],
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,5 +1,6 @@
 import { Shield, TrendingUp, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Logo } from "@/components/Logo";
 
 export const Dashboard = () => {
   const metrics = [
@@ -45,8 +46,11 @@ export const Dashboard = () => {
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-5xl font-bold mb-4 text-foreground">
-            PhishGuard Dashboard
+          <div className="flex justify-center mb-6">
+            <Logo size="xl" />
+          </div>
+          <h2 className="text-4xl font-bold mb-4 text-foreground">
+            Dashboard
           </h2>
           <p className="text-xl text-muted-foreground">
             Real-time monitoring and analytics

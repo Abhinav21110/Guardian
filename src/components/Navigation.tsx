@@ -2,6 +2,7 @@ import { Shield, Menu, X, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Logo } from "@/components/Logo";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,12 +19,9 @@ export const Navigation = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="relative flex items-center gap-2">
-              <img src="/logo.png" alt="PhishGuard Logo" className="w-8 h-8" />
-            </div>
-            <span className="text-2xl font-bold text-foreground">PhishGuard</span>
-          </div>
+          <Link to="/" className="group cursor-pointer">
+            <Logo size="md" />
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">

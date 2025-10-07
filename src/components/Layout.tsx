@@ -19,7 +19,7 @@ export const Layout = ({ children }: LayoutProps) => {
       <footer className="relative py-12 px-6 glass border-t border-border">
         <div className="container mx-auto text-center">
           <p className="text-muted-foreground">
-            © 2025 PhishGuard. All rights reserved.
+            © 2025 Guardian AI. All rights reserved.
           </p>
         </div>
       </footer>

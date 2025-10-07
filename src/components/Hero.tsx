@@ -1,31 +1,27 @@
 import { Shield, Scan, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 
 export const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="container relative z-10 mx-auto px-6 py-32 text-center">
-        {/* Humanized Logo */}
+        {/* Main Logo */}
         <div className="flex justify-center mb-8">
-          <div className="relative">
-            <div className="flex items-center gap-3 animate-float">
-              <Shield className="w-16 h-16 text-foreground" strokeWidth={1.5} />
-              <Users className="w-12 h-12 text-muted-foreground" strokeWidth={1.5} />
-            </div>
-          </div>
+          <Logo size="xl" className="animate-float" />
         </div>
 
         {/* Hero Text */}
         <h1 className="text-6xl md:text-8xl font-bold mb-6 text-foreground animate-fade-in">
-          PhishGuard AI
+          Guardian AI
         </h1>
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto animate-slide-up">
-          Enterprise-Grade Real-Time Phishing Detection
+          Advanced Threat Detection and Protection Platform
         </p>
         
         <p className="text-lg text-muted-foreground/80 mb-12 max-w-2xl mx-auto animate-slide-up [animation-delay:0.2s]">
-          Powered by advanced AI and machine learning, PhishGuard scans URLs, emails, and files in real-time to protect your organization from sophisticated phishing attacks.
+          Powered by advanced AI and machine learning, Guardian scans URLs, emails, and files in real-time to protect your organization from sophisticated cyber threats.
         </p>
 
         {/* CTA Buttons */}
@@ -49,9 +45,9 @@ export const Hero = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {[
-            { label: "Threats Blocked", value: "1.2M+", icon: Shield },
-            { label: "Detection Rate", value: "99.8%", icon: Scan },
-            { label: "Protected Users", value: "50K+", icon: Users },
+            { label: "Threats Blocked", value: "2.1M+", icon: Shield },
+            { label: "Detection Rate", value: "99.9%", icon: Scan },
+            { label: "Protected Users", value: "75K+", icon: Users },
           ].map((stat, index) => (
             <div
               key={index}

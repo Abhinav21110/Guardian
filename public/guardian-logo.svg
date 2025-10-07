@@ -1,0 +1,92 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer metallic border -->
+  <circle cx="32" cy="32" r="30" fill="url(#metallicGradient)" stroke="#B0B0B0" stroke-width="2"/>
+  
+  <!-- Dark blue background -->
+  <circle cx="32" cy="32" r="28" fill="#1a237e"/>
+  
+  <!-- Circuit board background pattern -->
+  <g opacity="0.3">
+    <path d="M12 20 L20 20 L20 24 L16 24 L16 28 L24 28" stroke="#64B5F6" stroke-width="1" fill="none"/>
+    <path d="M44 20 L52 20 L52 24 L48 24 L48 28 L56 28" stroke="#64B5F6" stroke-width="1" fill="none"/>
+    <circle cx="16" cy="36" r="1" fill="#64B5F6"/>
+    <circle cx="48" cy="36" r="1" fill="#64B5F6"/>
+    <circle cx="24" cy="44" r="1" fill="#64B5F6"/>
+    <circle cx="40" cy="44" r="1" fill="#64B5F6"/>
+  </g>
+  
+  <!-- Shield with blue glow -->
+  <defs>
+    <filter id="blueGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="redGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main shield -->
+  <path d="M32 12L48 20V36C48 44.8366 40.8366 52 32 52C23.1634 52 16 44.8366 16 36V20L32 12Z" 
+        fill="white" 
+        filter="url(#blueGlow)" 
+        stroke="#2196F3" 
+        stroke-width="1"/>
+  
+  <!-- Brain icon (upper left of shield) -->
+  <g filter="url(#blueGlow)">
+    <path d="M26 22C26 20 28 18 30 18C32 18 34 20 34 22C34 24 32 26 30 26C28 26 26 24 26 22Z" 
+          fill="none" 
+          stroke="white" 
+          stroke-width="1.5"/>
+    <path d="M27 20C27 18.5 28 17.5 30 17.5" fill="none" stroke="white" stroke-width="1"/>
+    <path d="M33 20C33 18.5 32 17.5 30 17.5" fill="none" stroke="white" stroke-width="1"/>
+  </g>
+  
+  <!-- Red zigzag line with heartbeat pattern -->
+  <g filter="url(#redGlow)">
+    <!-- Starting point -->
+    <rect x="8" y="30" width="3" height="3" fill="#F44336"/>
+    <!-- Zigzag line -->
+    <path d="M9.5 31.5 L15 28 L20 34 L25 26 L30 32 L35 28 L40 34 L45 30 L50 32" 
+          stroke="#F44336" 
+          stroke-width="2" 
+          fill="none"/>
+    <!-- Square markers -->
+    <rect x="14" y="27" width="2" height="2" fill="#F44336"/>
+    <rect x="19" y="33" width="2" height="2" fill="#F44336"/>
+    <rect x="24" y="25" width="2" height="2" fill="#F44336"/>
+    <rect x="29" y="31" width="2" height="2" fill="#F44336"/>
+    <rect x="34" y="27" width="2" height="2" fill="#F44336"/>
+    <rect x="39" y="33" width="2" height="2" fill="#F44336"/>
+    <rect x="49" y="31" width="2" height="2" fill="#F44336"/>
+  </g>
+  
+  <!-- Target/crosshair icon (below brain) -->
+  <g filter="url(#blueGlow)">
+    <!-- Outer circle -->
+    <circle cx="32" cy="38" r="8" fill="none" stroke="#2196F3" stroke-width="1.5"/>
+    <!-- Inner circle -->
+    <circle cx="32" cy="38" r="4" fill="none" stroke="#2196F3" stroke-width="1"/>
+    <!-- Cross lines -->
+    <line x1="24" y1="38" x2="40" y2="38" stroke="#2196F3" stroke-width="1"/>
+    <line x1="32" y1="30" x2="32" y2="46" stroke="#2196F3" stroke-width="1"/>
+    <!-- Center dot -->
+    <circle cx="32" cy="38" r="2" fill="#F44336"/>
+  </g>
+  
+  <defs>
+    <linearGradient id="metallicGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0E0E0"/>
+      <stop offset="50%" stop-color="#B0B0B0"/>
+      <stop offset="100%" stop-color="#808080"/>
+    </linearGradient>
+  </defs>
+</svg>
