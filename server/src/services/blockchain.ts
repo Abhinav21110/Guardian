@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
-import { config } from '../config/env';
-import { logger } from '../config/logger';
+import { config } from '../config/env.js';
+import { logger } from '../config/logger.js';
 
 export type AnchorResult = { txHash: string; chainId: number };
 
@@ -10,18 +10,19 @@ export class BlockchainService {
   private contract: ethers.Contract | null = null;
 
   constructor() {
-    if (!config.rpcUrl || !config.privateKey) {
+    const { rpcUrl, privateKey, chainId, contractAddress } = config.blockchain;
+    if (!rpcUrl || !privateKey) {
       logger.warn('Blockchain not configured; RPC_URL or PRIVATE_KEY missing');
       return;
     }
-    this.provider = new ethers.JsonRpcProvider(config.rpcUrl, config.chainId);
-    this.wallet = new ethers.Wallet(config.privateKey, this.provider);
-    if (config.contractAddress) {
+    this.provider = new ethers.JsonRpcProvider(rpcUrl, chainId);
+    this.wallet = new ethers.Wallet(privateKey, this.provider);
+    if (contractAddress) {
       const abi = [
         'function anchor(bytes32 hash) public returns (bool)',
         'event Anchored(bytes32 indexed hash, address indexed by)'
       ];
-      this.contract = new ethers.Contract(config.contractAddress, abi, this.wallet);
+      this.contract = new ethers.Contract(contractAddress, abi, this.wallet);
     }
   }
 

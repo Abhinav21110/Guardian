@@ -1,0 +1,89 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – PostgreSQL StatefulSet + Service
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: guardian-postgres-svc
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  selector:
+    app: guardian-ai
+    component: postgres
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: guardian-postgres
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: postgres
+spec:
+  serviceName: guardian-postgres-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guardian-ai
+      component: postgres
+  template:
+    metadata:
+      labels:
+        app: guardian-ai
+        component: postgres
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: guardian_ai
+            - name: POSTGRES_USER
+              value: guardian
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "guardian", "-d", "guardian_ai"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "guardian", "-d", "guardian_ai"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi

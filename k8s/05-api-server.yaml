@@ -1,0 +1,160 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – API Server Deployment + Service + HPA
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: guardian-api-svc
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  selector:
+    app: guardian-ai
+    component: api
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian-api
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: api
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: guardian-ai
+      component: api
+  template:
+    metadata:
+      labels:
+        app: guardian-ai
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/api/health"
+    spec:
+      serviceAccountName: default
+      securityContext:
+        runAsUser: 1001
+        runAsNonRoot: true
+        fsGroup: 1001
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: api
+          image: guardian-ai/server:latest    # Replace with your registry image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: guardian-config
+          env:
+            # Secrets injected individually
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: DB_PASSWORD
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: REDIS_PASSWORD
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: OPENAI_API_KEY
+            - name: VIRUSTOTAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: VIRUSTOTAL_API_KEY
+            - name: GOOGLE_SAFE_BROWSING_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: GOOGLE_SAFE_BROWSING_API_KEY
+            - name: IPINFO_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: IPINFO_TOKEN
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: API_KEY
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /api/health/live
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: guardian-api-hpa
+  namespace: guardian-ai
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: guardian-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

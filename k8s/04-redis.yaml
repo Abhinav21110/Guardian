@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – Redis Deployment + Service
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: guardian-redis-svc
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+  selector:
+    app: guardian-ai
+    component: redis
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian-redis
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guardian-ai
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: guardian-ai
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guardian-secrets
+                  key: REDIS_PASSWORD
+          args:
+            - "--requirepass"
+            - "$(REDIS_PASSWORD)"
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          emptyDir: {}

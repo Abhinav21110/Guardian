@@ -1,0 +1,73 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – Frontend Deployment + Service
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: guardian-frontend-svc
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http
+  selector:
+    app: guardian-ai
+    component: frontend
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian-frontend
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+    component: frontend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: guardian-ai
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: guardian-ai
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: guardian-ai/frontend:latest  # Replace with your registry image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10

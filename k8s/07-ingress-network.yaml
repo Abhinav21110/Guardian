@@ -1,0 +1,93 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – Ingress
+# Requires: nginx-ingress controller + cert-manager for TLS
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: guardian-ingress
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    # Rate limiting via nginx ingress (per IP)
+    nginx.ingress.kubernetes.io/limit-rps: "30"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    # TLS cert from cert-manager (comment out if using your own cert)
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # CORS handled by the app; nginx ingress should pass through
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+spec:
+  tls:
+    - hosts:
+        - guardian.example.com         # REPLACE with your domain
+        - api.guardian.example.com     # REPLACE with your domain
+      secretName: guardian-tls
+
+  rules:
+    # Frontend
+    - host: guardian.example.com       # REPLACE
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: guardian-frontend-svc
+                port:
+                  number: 80
+
+    # API – exposed on a subdomain; can also be /api/* on the same host
+    - host: api.guardian.example.com   # REPLACE
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: guardian-api-svc
+                port:
+                  number: 8080
+
+---
+# ── NetworkPolicy: restrict inter-pod communication ──────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: guardian-network-policy
+  namespace: guardian-ai
+spec:
+  # API server can only receive from: frontend, ingress, same namespace
+  podSelector:
+    matchLabels:
+      component: api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              component: frontend
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+  egress:
+    # Allow DB + Redis within namespace
+    - to:
+        - podSelector:
+            matchLabels:
+              component: postgres
+        - podSelector:
+            matchLabels:
+              component: redis
+    # Allow outbound HTTPS for external threat intel APIs
+    - ports:
+        - port: 443
+          protocol: TCP
+        - port: 53
+          protocol: UDP

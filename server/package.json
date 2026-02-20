@@ -1,19 +1,17 @@
 {
-  "name": "server",
+  "name": "guardian-ai-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Guardian AI – Real-time Hybrid Cybersecurity API Gateway",
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p .",
-    "start": "cross-env NODE_ENV=production node dist/index.js"
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
   },
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
-  },
-  "keywords": [],
+  "keywords": ["guardian", "security", "ai", "phishing", "cybersecurity"],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -24,8 +22,11 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
+    "openai": "^4.104.0",
+    "pg": "^8.16.0",
     "pino": "^10.0.0",
     "pino-pretty": "^13.1.1",
+    "redis": "^4.7.1",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -33,6 +34,7 @@
     "@types/express": "^5.0.3",
     "@types/helmet": "^0.0.48",
     "@types/node": "^24.7.0",
+    "@types/pg": "^8.11.14",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"

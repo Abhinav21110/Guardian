@@ -1,0 +1,133 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – Docker Compose (local development + production-like stack)
+# Usage:
+#   dev:  docker compose up
+#   prod: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "3.9"
+
+# ── Shared networks ────────────────────────────────────────────────────────────
+networks:
+  guardian-net:
+    driver: bridge
+
+# ── Named volumes ──────────────────────────────────────────────────────────────
+volumes:
+  postgres-data:
+  redis-data:
+
+# ── Services ───────────────────────────────────────────────────────────────────
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: guardian-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       guardian_ai
+      POSTGRES_USER:     guardian
+      POSTGRES_PASSWORD: guardian_secret
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - guardian-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guardian -d guardian_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"   # remove in production
+
+  # ── Redis ────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: guardian-redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning --requirepass guardian_redis_secret
+    volumes:
+      - redis-data:/data
+    networks:
+      - guardian-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "guardian_redis_secret", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "6379:6379"   # remove in production
+
+  # ── API Server ───────────────────────────────────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: guardian-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV:                   production
+      PORT:                       8080
+      CORS_ORIGIN:                http://localhost:3000
+
+      # Database
+      DB_HOST:                    postgres
+      DB_PORT:                    5432
+      DB_NAME:                    guardian_ai
+      DB_USER:                    guardian
+      DB_PASSWORD:                guardian_secret
+
+      # Redis
+      REDIS_URL:                  redis://:guardian_redis_secret@redis:6379
+
+      # Feature flags (override via .env or Docker secrets in prod)
+      ENABLE_ML:                  "true"
+      ENABLE_LLM:                 "true"
+      ENABLE_THREAT_INTEL:        "true"
+      ENABLE_BLOCKCHAIN:          "false"
+
+      # API keys – set these in .env or via Docker secrets
+      OPENAI_API_KEY:             ${OPENAI_API_KEY:-}
+      VIRUSTOTAL_API_KEY:         ${VIRUSTOTAL_API_KEY:-}
+      GOOGLE_SAFE_BROWSING_API_KEY: ${GOOGLE_SAFE_BROWSING_API_KEY:-}
+      IPINFO_TOKEN:               ${IPINFO_TOKEN:-}
+      API_KEY:                    ${API_KEY:-}
+
+    networks:
+      - guardian-net
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      retries: 3
+
+  # ── Frontend ─────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8080
+    container_name: guardian-frontend
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - guardian-net
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

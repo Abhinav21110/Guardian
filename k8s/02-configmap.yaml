@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Guardian AI – ConfigMap (non-sensitive configuration)
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: guardian-config
+  namespace: guardian-ai
+  labels:
+    app: guardian-ai
+data:
+  NODE_ENV: "production"
+  PORT: "8080"
+  LOG_LEVEL: "info"
+
+  # Database
+  DB_HOST: "guardian-postgres-svc"
+  DB_PORT: "5432"
+  DB_NAME: "guardian_ai"
+  DB_USER: "guardian"
+  DB_SSL: "false"
+
+  # Redis
+  REDIS_URL: "redis://:$(REDIS_PASSWORD)@guardian-redis-svc:6379"
+
+  # CORS – update with your actual frontend domain
+  CORS_ORIGIN: "https://guardian.example.com"
+
+  # Rate limiting
+  RATE_LIMIT_WINDOW_MS: "60000"
+  RATE_LIMIT_MAX: "100"
+  SCAN_RATE_LIMIT_MAX: "20"
+
+  # Feature flags
+  ENABLE_ML: "true"
+  ENABLE_LLM: "true"
+  ENABLE_THREAT_INTEL: "true"
+  ENABLE_BLOCKCHAIN: "false"
+  CACHE_TTL_SECONDS: "300"
+
+  # OpenAI model
+  OPENAI_MODEL: "gpt-4o-mini"
