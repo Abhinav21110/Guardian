@@ -15,6 +15,9 @@ build/
 .env.test.local
 .env.production.local
 
+# Internal documentation
+ML_ENHANCEMENT_PLAN.md
+
 # IDE files
 .vscode/
 .idea/
