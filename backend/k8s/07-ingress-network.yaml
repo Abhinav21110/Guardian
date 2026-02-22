@@ -51,7 +51,7 @@ spec:
               service:
                 name: guardian-api-svc
                 port:
-                  number: 8080
+                  number: 3001
 
 ---
 # ── NetworkPolicy: restrict inter-pod communication ──────────────────────────
