@@ -12,8 +12,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 3001
+      targetPort: 3001
       name: http
   selector:
     app: guardian-ai
@@ -48,7 +48,7 @@ spec:
         component: api
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
+        prometheus.io/port: "3001"
         prometheus.io/path: "/api/health"
     spec:
       serviceAccountName: default
@@ -59,10 +59,10 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: api
-          image: guardian-ai/server:latest    # Replace with your registry image
+          image: guardian-ai/backend:latest    # Replace with your registry image
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 3001
               name: http
           envFrom:
             - configMapRef:
@@ -113,16 +113,16 @@ spec:
               cpu: "1000m"
           livenessProbe:
             httpGet:
-              path: /api/health/live
-              port: 8080
+              path: /api/health/ping
+              port: 3001
             initialDelaySeconds: 20
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /api/health/ready
-              port: 8080
+              path: /api/health
+              port: 3001
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5

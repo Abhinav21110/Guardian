@@ -10,7 +10,7 @@ metadata:
     app: guardian-ai
 data:
   NODE_ENV: "production"
-  PORT: "8080"
+  PORT: "3001"
   LOG_LEVEL: "info"
 
   # Database
