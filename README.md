@@ -1,270 +1,265 @@
-# Guardian AI
+# 🛡️ Guardian AI – Hybrid Real-Time Phishing & Social Engineering Detection Engine
 
-> **Production-ready hybrid cybersecurity platform** combining ML, LLMs, and live Threat Intelligence to detect phishing URLs, malicious emails, and social engineering attacks in real time.
+Guardian AI is a real-time hybrid cybersecurity platform that detects phishing URLs, malicious emails, and advanced social engineering attacks by combining Machine Learning, Large Language Models (LLMs), and live Threat Intelligence feeds into a unified explainable risk engine.
 
 ---
 
-## Architecture
+# 🎯 Vision
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                        Guardian AI Platform                      │
-├─────────────┬─────────────────┬──────────────────┬──────────────┤
-│  React SPA  │   API Gateway   │   Risk Fusion    │  PostgreSQL  │
-│  (Vite)     │  (Express TS)   │     Engine       │   + Redis    │
-├─────────────┴─────────────────┴──────────────────┴──────────────┤
-│          ML Analyser  │  LLM Analyser  │  Threat Intel           │
-│  (URL feature scoring)│ (OpenAI GPT)   │ (VT / GSB / WHOIS)      │
-└─────────────────────────────────────────────────────────────────┘
-```
+Guardian is designed to be:
+
+- Real-time
+- Explainable
+- Hybrid AI-powered (ML + LLM)
+- Threat-intelligence integrated
+- API-first
+- Dashboard-driven
+- Deployable via Docker & Kubernetes
+
+---
+
+# 🧠 Core Detection Architecture
+
+Guardian operates through multiple integrated layers:
+
+## 1️⃣ Machine Learning Layer (Structured Detection)
+
+### URL-Based Signals
+
+- URL length
+- Suspicious characters (@, -, //)
+- Excessive subdomains
+- IP-based URLs
+- Entropy score
+- Suspicious TLDs (.xyz, .top, .click, etc.)
+- HTTPS presence
+- SSL certificate mismatch
+- Domain age (WHOIS)
+- DNS anomalies
+
+### Output
+
+- ML Risk Score (0–100)
+- Phishing probability
+- Feature importance explanation
+
+---
+
+## 2️⃣ LLM Semantic Intelligence Layer
+
+### Email & Webpage Text Analysis
+
+Detects:
+
+- Urgency manipulation
+- Authority impersonation
+- Fear-based coercion
+- Reward baiting
+- Credential harvesting prompts
+- Brand impersonation
+- Suspicious tone patterns
+
+### Screenshot Analysis (OCR)
+
+- Fake login detection
+- Brand cloning detection
+- Suspicious form prompts
+
+### Output
+
+- Semantic Risk Score (0–100)
+- Attack type classification
+- Human-readable explanation
+
+---
+
+## 3️⃣ Threat Intelligence Layer
+
+### Integrations
+
+- VirusTotal
+- Google Safe Browsing
+- WHOIS lookup
+- IP Geolocation
+- ASN analysis
+
+### Output
+
+- External Threat Score
+- Known malicious indicator flag
+
+---
+
+## 4️⃣ Risk Fusion Engine
+
+Weighted aggregation of detection sources:
+
+| Component       | Weight |
+|----------------|----------|
+| ML Model        | 40% |
+| LLM Analysis    | 30% |
+| Threat Intel    | 20% |
+| Domain Age Risk | 10% |
+
+### Final Output
+
+- Unified Risk Score (0–100)
+- Classification:
+  - Safe
+  - Suspicious
+  - High Risk
+  - Confirmed Phishing
+- Confidence percentage
+- Full breakdown by source
+
+---
+
+# 🚀 Real-Time Capabilities
+
+## Live URL Scanner
+
+- Instant URL analysis
+- Full detection pipeline triggered
+
+## Email Scanner Mode
+
+- Manual email input
+- IMAP inbox monitoring
+- Real-time phishing alerts
+
+## Website Screenshot Analyzer
+
+- Headless browser loading
+- Screenshot capture
+- OCR extraction
+- LLM-based login page analysis
+
+---
+
+# 🧠 Explainable AI
+
+Guardian provides full transparency.
+
+### ML Explanation
+
+- Domain age indicators
+- Suspicious TLD detection
+- IP-based URL usage
+- Entropy anomalies
+
+### LLM Explanation
+
+- Urgency detection
+- Account suspension threats
+- Credential harvesting prompts
+- Emotional manipulation patterns
+
+---
+
+# 📊 SOC-Style Dashboard
+
+Dashboard includes:
+
+- Total scans
+- Phishing detected
+- Suspicious vs Safe ratio
+- Real-time scan logs
+- Geo-location mapping
+- Attack category distribution
+- Detection trends over time
+
+---
+
+# 🌐 Browser Extension
 
 ## Features
 
-| Layer | What it does |
-|-------|-------------|
-| **ML URL Analyser** | 25+ structural features: entropy, homoglyphs, TLD risk, subdomain depth, IP detection, brand similarity → 0–100 risk score |
-| **LLM Semantic Engine** | GPT-4o-mini analyses URL / email for urgency manipulation, authority impersonation, credential harvesting, brand impersonation |
-| **Threat Intelligence** | Parallel queries: VirusTotal v3, Google Safe Browsing v4, WHOIS, IP-geolocation |
-| **Risk Fusion Engine** | Weighted combination (ML 35% + LLM 35% + TI 30%) with hard overrides for known-malicious signals |
-| **Email Analyser** | Header anomaly detection, spoofing indicators, URL extraction + sub-scanning |
-| **SOC Dashboard** | Live stats, tier breakdowns, recent scans feed, processing metrics |
-| **Caching** | Redis-backed result cache (5 min TTL) with in-memory fallback |
-| **Persistence** | PostgreSQL with full scan history, indexed for analytics |
-| **Blockchain Anchoring** | Optional EVM-compatible hash anchoring for audit trails |
+- Automatic scanning on website visit
+- Real-time status indicator:
+  - 🟢 Safe
+  - ⚠ Suspicious
+  - 🔴 Phishing
+- Popup with detailed explanation
+- Risk breakdown display
 
-## API Endpoints
+---
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/health` | Liveness |
-| `GET` | `/api/health/ready` | Readiness probe |
-| `GET` | `/api/health/live` | Kubernetes liveness |
-| `POST` | `/api/scan/url` | Scan a single URL |
-| `POST` | `/api/scan/batch` | Scan up to 10 URLs |
-| `GET` | `/api/scan/:id` | Retrieve scan by ID |
-| `POST` | `/api/email/analyse` | Analyse an email |
-| `GET` | `/api/dashboard/stats` | SOC dashboard stats |
-| `GET` | `/api/dashboard/recent` | Recent scans feed |
-| `GET` | `/api/reports` | Paginated scan history |
-| `GET` | `/api/reports/:id` | Single scan detail |
-| `GET` | `/api/threats/feed` | High-risk & confirmed phishing feed |
-| `GET` | `/api/threats/stats` | Threat category/tier breakdown |
+# 🔐 Security Architecture
 
-### Example – Scan a URL
+Guardian follows a microservice-ready architecture:
 
-```bash
-curl -X POST http://localhost:8080/api/scan/url \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://paypa1-verification.tk/login"}'
-```
+- API Gateway
+- ML Service
+- LLM Service
+- Threat Intelligence Service
+- Risk Fusion Engine
+- Dashboard Frontend
 
-```json
-{
-  "scanId": "uuid",
-  "fusion": {
-    "unifiedRiskScore": 94,
-    "tier": "CONFIRMED_PHISHING",
-    "confidence": 0.97,
-    "attackCategory": "CREDENTIAL_HARVESTING",
-    "topIndicators": ["Homoglyph brand impersonation", "Suspicious TLD (.tk)", "Suspicious keywords"],
-    "recommendation": "BLOCK IMMEDIATELY..."
-  }
-}
-```
+---
 
-## Quick Start
+# 🐳 Deployment
 
-### Docker Compose (recommended)
+Guardian is deployable using:
 
-```bash
-# 1. Configure secrets
-cp server/.env.example server/.env
-# Edit server/.env – set OPENAI_API_KEY, VIRUSTOTAL_API_KEY, etc.
+- Docker containers
+- Kubernetes orchestration
+- Network policies (e.g., Calico)
+- Horizontal scaling support
 
-# 2. Start full stack
-docker compose up --build
+---
 
-# Frontend: http://localhost:3000
-# API:      http://localhost:8080
-```
+# 📡 API Capabilities
 
-### Local Development
+Guardian exposes REST endpoints for:
 
-```bash
-# Server
-cd server && npm install --legacy-peer-deps && npm run dev
+- URL scanning
+- Email analysis
+- Screenshot analysis
+- Risk report retrieval
+- Real-time monitoring integration
 
-# Frontend (new terminal)
-cd .. && npm install && npm run dev
-```
+---
 
-> The server degrades gracefully – DB/Redis/API keys are all optional.  
-> Without keys, ML analysis still runs fully; LLM/Threat Intel return empty results.
+# 🧪 Optional Advanced Features (Post-MVP)
 
-## Environment Variables
+## Phishing Simulation Mode
 
-See [`server/.env.example`](server/.env.example). Key vars:
+- Generate phishing templates
+- Explain detection triggers
+- Awareness training mode
 
-| Variable | Description |
-|----------|-------------|
-| `OPENAI_API_KEY` | Enables LLM semantic analysis |
-| `VIRUSTOTAL_API_KEY` | VirusTotal scanning |
-| `GOOGLE_SAFE_BROWSING_API_KEY` | Google Safe Browsing |
-| `IPINFO_TOKEN` | IP geolocation |
-| `API_KEY` | Secure all routes with a shared key |
-| `ENABLE_ML/LLM/THREAT_INTEL` | Toggle individual engines |
+## Red Team Analysis Mode
 
-## Kubernetes Deployment
+- Analyze Nmap scans
+- Identify exploitation patterns
+- Suggest mitigation steps
 
-```bash
-# Edit secrets first, then apply in order:
-kubectl apply -f k8s/00-namespace.yaml
-kubectl apply -f k8s/01-secrets.yaml
-kubectl apply -f k8s/02-configmap.yaml
-kubectl apply -f k8s/03-postgres.yaml
-kubectl apply -f k8s/04-redis.yaml
-kubectl apply -f k8s/05-api-server.yaml   # includes HPA (2–10 replicas)
-kubectl apply -f k8s/06-frontend.yaml
-kubectl apply -f k8s/07-ingress-network.yaml
-```
+## Zero-Day Detection Mode
 
-## Risk Tiers
+- Autoencoder-based anomaly detection
+- Unknown phishing pattern detection
 
-| Score | Tier | Action |
-|-------|------|--------|
-| 0–34  | SAFE | No significant indicators |
-| 35–59 | SUSPICIOUS | Verify before interacting |
-| 60–79 | HIGH_RISK | Clear attack patterns |
-| 80–100 | CONFIRMED_PHISHING | Block immediately |
+---
 
-## Project Structure
+# ✅ Final MVP Capabilities Checklist
 
-```
-Guardian/
-├── src/                        # React frontend (Vite + TypeScript)
-│   ├── components/             # Scanner, Dashboard, …
-│   └── lib/api.ts              # Typed API client
-├── server/src/
-│   ├── services/
-│   │   ├── ml-analyzer.ts      # URL feature extraction + scoring
-│   │   ├── llm-analyzer.ts     # OpenAI semantic analysis
-│   │   ├── threat-intelligence.ts  # VT + GSB + WHOIS + GeoIP
-│   │   ├── risk-fusion.ts      # Weighted risk engine
-│   │   ├── email-analyzer.ts   # Email analysis
-│   │   ├── cache.ts            # Redis + memory fallback
-│   │   └── database.ts         # PostgreSQL + memory fallback
-│   ├── middleware/             # Auth, validation, errors
-│   └── routes/                # scan / email / dashboard / threats
-├── k8s/                        # Kubernetes manifests
-├── docker-compose.yml
-├── Dockerfile                  # Frontend Nginx image
-└── server/Dockerfile           # API Node.js image
-```
+Guardian AI MVP supports:
 
-## License
+- ✔ URL scanning
+- ✔ Email analysis
+- ✔ Screenshot analysis
+- ✔ ML-based detection
+- ✔ LLM-based semantic analysis
+- ✔ Threat intelligence integration
+- ✔ Unified risk scoring
+- ✔ Explainable AI breakdown
+- ✔ SOC-style dashboard
+- ✔ REST API
+- ✔ Optional browser extension
+- ✔ Docker & Kubernetes deployment
 
-ISC
+---
 
-## Overview
+# 🎖️ Resume Description
 
-Guardian AI is a comprehensive threat detection solution powered by advanced AI and machine learning. It provides real-time scanning of URLs, emails, and files to protect organizations from sophisticated cyber threats and attacks.
-
-## Features
-
-- **Real-time URL Analysis**: Instant detection of malicious URLs
-- **Email Security**: Advanced email content analysis and threat detection
-- **File Scanning**: Comprehensive file analysis for embedded threats
-- **AI-Powered Detection**: Machine learning algorithms for evolving threat patterns
-- **Enterprise Dashboard**: Comprehensive management and reporting interface
-- **API Integration**: RESTful APIs for seamless integration
-
-## Technology Stack
-
-- **Frontend**: React 18, TypeScript, Vite
-- **UI Framework**: shadcn/ui components with Radix UI primitives
-- **Styling**: Tailwind CSS with custom design system
-- **State Management**: React Query for server state
-- **Form Handling**: React Hook Form with Zod validation
-- **Icons**: Lucide React
-- **Charts**: Recharts for data visualization
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd guardian-ai
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm run dev
-```
-
-4. Open your browser and navigate to `http://localhost:8080`
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-### Preview Production Build
-
-```bash
-npm run preview
-```
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run build:dev` - Build in development mode
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-├── pages/              # Page components
-├── hooks/              # Custom React hooks
-├── lib/                # Utility functions and configurations
-├── types/              # TypeScript type definitions
-└── utils/              # Helper functions
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support and questions, please contact our team or open an issue in this repository.#   G u a r d i a n 
- 
- #   G u a r d i a n 
- 
- #   G u a r d i a n 
- 
- 
+Built Guardian AI — a hybrid machine learning and LLM-powered phishing detection platform integrating real-time threat intelligence, semantic analysis, explainable risk scoring, and deployable microservice architecture.
